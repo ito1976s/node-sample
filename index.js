@@ -109,17 +109,33 @@ app.get('/api/1/contacts', function (req, res) {
 
 app.get('/api/1/contacts/:id', function (req, res) {
   // TODO: Get a contact object by ID
-  if (req.params.id.match(/^[0-9a-zA-Z]+/)) {
-    //if (req.params.id == contacts[x].id) {
-    res.status(200).json({contacts:[contacts[req.params.id]]});
-    return;
-    //}
+  var id = req.params.id;
+  var found = false;
+  if (id.match(/^[0-9a-zA-Z]+/)) {
+    if (contacts[id]) {
+      found = true;
+    }
   }
-  res.status(404).json({error:"userid not found"});
+  if (found) {
+    res.status(200).json({contacts:[contacts[id]]});
+  } else {
+    res.status(404).json({error:"userid not found"});
+  }
 });
 
 app.post('/api/1/contacts', function (req, res) {
   // TODO: Create a contact
+  var id = contactID++;
+  var contact = req.body;
+  if (!contact) {
+    res.status(500).json({
+      error: "cannot create contact"
+    });
+  } else {
+    contact.id = id;
+    contacts[id] = contact;
+    res.status(200).json(contact);
+  }
 });
 
 app.delete('/api/1/contacts/:id', function (req, res) {
